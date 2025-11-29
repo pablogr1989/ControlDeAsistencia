@@ -1,0 +1,30 @@
+[
+    {
+        "comando": "initial_greetings",
+        "intenciones": ["saludo", "hola", "qué tal", "estás ahí", "hey sistema"],
+        "parametro_requerido": false,
+        "descripcion_parametro": "No requiere argumento. El valor de 'parametro' siempre debe ser null.",
+        "instruccion_llm": "Si detectas cualquier saludo o verificación de estado, usa este comando. El foco es la respuesta conversacional ('frase_de_vuelta') que indique que el asistente está listo."
+    },
+    {
+        "comando": "open_youtube",
+        "intenciones": ["abre youtube", "busca un video", "ponme en youtube", "quiero ver"],
+        "parametro_requerido": true,
+        "descripcion_parametro": "La búsqueda completa que incluye el tema, título o creador.",
+        "instruccion_llm": "OBLIGATORIO: El 'parametro' DEBE ser la cadena de texto limpia y optimizada para la búsqueda. Debes ELIMINAR todo el relleno conversacional, pero MANTENER nombres de creadores (ej. AuronPlay) y títulos completos."
+    },
+    {
+        "comando": "set_alarm",
+        "intenciones": ["pon una alarma", "temporizador", "alarma a las", "en X minutos"],
+        "parametro_requerido": true,
+        "descripcion_parametro": "La duración (ej. '10 minutos') o la hora específica (ej. 'a las 7 AM').",
+        "instruccion_llm": "OBLIGATORIO: El 'parametro' DEBE contener la hora exacta o duración de la alarma (ej. 'a las 5:30 PM', 'en media hora', 'en 45 minutos'). Elimina cualquier palabra que no sea la especificación de tiempo."
+    },
+    {
+        "comando": "No identificado",
+        "intenciones": [],
+        "parametro_requerido": false,
+        "descripcion_parametro": "El texto completo de la entrada del usuario.",
+        "instruccion_llm": "Este comando se usa solo si la intención no coincide con ningún otro comando. El 'parametro' es el texto original."
+    }
+]

@@ -5,39 +5,47 @@ from utils.sound import Sound
 class Voice:        
     def __init__(self):
         self.sound = Sound()
+        self.recognizer = sr.Recognizer()
+        self.micro = sr.Microphone()
+        with self.micro as source:
+            self.recognizer.adjust_for_ambient_noise(source)
             
-    def listen(self):    
-        # Recognizer
-        r = sr.Recognizer()
-        m = sr.Microphone()        
-        # Configuramos el micro
-        with m as origin:
-            # Tiempo que espera para ver si has dejado de hablar
-            r.pause_threshold = 2
-            r.non_speaking_duration = 2
+        self.recognizer.energy_threshold = self.recognizer.energy_threshold * 50
+        self.recognizer.pause_threshold = 2
+        self.recognizer.non_speaking_duration = 2
             
-            # Durante 1.5 segundos graba el sonido para ver el cual es el nivel 
-            # de ruido del ambiente y asi determinar que es silencio y que no
-            r.adjust_for_ambient_noise(origin, duration=1.5)
+    # def listen(self):    
+    #     # Recognizer
+    #     r = sr.Recognizer()
+    #     m = sr.Microphone()        
+    #     # Configuramos el micro
+    #     with m as origin:
+    #         # Tiempo que espera para ver si has dejado de hablar
+    #         r.pause_threshold = 2
+    #         r.non_speaking_duration = 2
             
-            # Informamos que comienza la grabación
-            print('Puedes comenzar a hablar')
-            self.sound.play_sound(self.sound.START_SOUND) 
+    #         # Durante 1.5 segundos graba el sonido para ver el cual es el nivel 
+    #         # de ruido del ambiente y asi determinar que es silencio y que no
+    #         r.adjust_for_ambient_noise(origin, duration=1.5)
+            
+    #         # Informamos que comienza la grabación
+    #         print('Puedes comenzar a hablar')
+    #         self.sound.play_sound(self.sound.START_SOUND) 
                        
-            try:
-                audio = r.listen(origin, phrase_time_limit=None)
-                self.sound.play_sound(self.sound.END_SOUND)
-                text = r.recognize_google(audio, language='es-es')
-                return text
-            except sr.UnknownValueError:
-                print('Ups, no te entendí')
-                return "Error"
-            except sr.RequestError:
-                print('Ups, sin servicio')
-                return "Error"
-            except:
-                print('Ups, algo ha salido mal')
-                return "Error"
+    #         try:
+    #             audio = r.listen(origin, phrase_time_limit=None)
+    #             self.sound.play_sound(self.sound.END_SOUND)
+    #             text = r.recognize_google(audio, language='es-es')
+    #             return text
+    #         except sr.UnknownValueError:
+    #             print('Ups, no te entendí')
+    #             return "Error"
+    #         except sr.RequestError:
+    #             print('Ups, sin servicio')
+    #             return "Error"
+    #         except:
+    #             print('Ups, algo ha salido mal')
+    #             return "Error"
             
     def talk(self, msg):
         newVoiceRate = 180
@@ -67,4 +75,3 @@ class Voice:
     #             self.registered_users.append({"User": usuario})
     #             save_users(self.registered_users)
     #             stop = True
-        

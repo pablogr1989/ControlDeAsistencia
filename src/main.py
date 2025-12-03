@@ -1,65 +1,64 @@
-from core.rec_voz import *
-from core.openai_client import OpenAIClient
-from core.ollama_client import OllamaClient
-from core.rec_facial import Facial
+from core.voice import *
+from core.facial import Facial
 from utils.file_manager import *
-from core.command_actions import *
 from utils.paths_utils import *
+from core.users_system import Login, UserUtils
+from core.command_manager import CommandManager
 import time
-import threading
 
 def main():
-    start_time = time.time()
-    openai = OpenAIClient()
-    ollama = OllamaClient()
-    rec_voice = Voice()
-    #rec_facial = Facial()
+    #start_time = time.time()
+    voice = Voice()
+    facial = Facial()
     sound_player = Sound()
-    commands = load_data("commands.json")
-    users = load_data("users.json")
+    file_name = "users.json"
+    users = UserUtils.load_users(file_name)    
+    login = Login(users)
+    command_manager = CommandManager()     
+       
+    user = users['teivko']    
+    photo = facial.take_photo(user.nickname + ".png")
+    photo = facial.assign_color_profile(photo)
+    photo_code = facial.get_cod_face(photo)
+    
+    print(f"Foto actual:\n{photo_code}")
+    print(f"\n\n")
+    print(f"Foto usuario:\n{user.face_code}")
+    
+    if facial.is_the_same(user.face_code, photo_code):
+        voice.talk(f"Bienvenido {user.name}")
+    
+    #UserUtils.save_users(users, file_name)
+        
+    return
+  
     exit = False
     command_list = []
-    list_lock = threading.Lock()
     
     
-    def background_processor(recognizer, audio):         
-        try:
-            nonlocal exit, command_list
-            nonlocal list_lock
-            wake_phrases = ["hey sistema", "buenas sistema", "sistema me escuchas", "hola sistema", "sistema despierta"]
-            
-            # 1. Transcribir el audio
-            text = recognizer.recognize_google(audio, language='es-es')
-            print(f"He escuchado: {text}")
-            
-            if any(phrase in text for phrase in wake_phrases):
-                response = ollama.call_ollama(commands=commands, audio_text=text)
-                command = extract_command(response)
-                with list_lock:
-                    command_list.append(command)      
-                      
-            exit_phrases = ["exit", "salir del programa", "terminar programa", "terminar el programa", "abortar programa"]
-            if any(phrase in text for phrase in exit_phrases):
-                print("Veo que quieres salir")
-                exit = True
-            
-            # if "sistema" in text.lower() or "hola" in text.lower():
+    
+    # try:
+    #     command_manager.start_listen()
+        
+    #     while not command_manager.exit:
+    #         command = command_manager.get_next_command()
+    #         if command:
+    #             print(f"Ejecutando: {command['comando']}")
+    #         else:
+    #             time.sleep(0.1)
                 
-            #     response_ollama = ollama.call_ollama(commands=commands, audio_text=text)
-                
-            #     if response_ollama:
-            #         # Aquí va la lógica de extracción y ejecución de comandos
-            #         first_command = response_ollama['comandos'][0]
-            
-        except sr.UnknownValueError:
-            # Silencioso en modo fondo para no molestar si no se entendió
-            pass 
-        except sr.RequestError:
-            print("[ERROR] Fallo en el servicio de transcripción de Google.")
-        except Exception as e:
-            print(f"[ERROR] Procesando audio en fondo: {e}")
-            
-    rec_voice.recognizer.listen_in_background(rec_voice.micro, background_processor)
+    # except KeyboardInterrupt:
+    #     # Esto captura si el usuario pulsa Ctrl+C en la consola
+    #     print("\nInterrupción de teclado detectada.")
+
+    # finally:
+
+    #     print("Cerrando recursos...")
+    #     command_manager.stop_listen() 
+    #     print("Programa terminado.")
+    
+    return       
+    
 
         
     while not exit:

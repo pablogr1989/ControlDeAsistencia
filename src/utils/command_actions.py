@@ -2,9 +2,6 @@ import webbrowser
 from urllib.parse import quote_plus
 import json
 
-def extract_command(commands):
-        return commands['comandos'][0]
-
 def ejecutar_abrir_youtube(parametro_busqueda: str):
         if not parametro_busqueda:
             print("ERROR: Parámetro de búsqueda no proporcionado para Abrir Youtube.")

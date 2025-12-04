@@ -1,12 +1,5 @@
 [
     {
-        "comando": "initial_greetings",
-        "intenciones": ["saludo", "hola", "qué tal", "estás ahí", "hey sistema"],
-        "parametro_requerido": false,
-        "descripcion_parametro": "No requiere argumento. El valor de 'parametro' siempre debe ser null.",
-        "instruccion_llm": "Si detectas cualquier saludo o verificación de estado, usa este comando. El foco es la respuesta conversacional ('frase_de_vuelta') que indique que el asistente está listo."
-    },
-    {
         "comando": "open_youtube",
         "intenciones": ["abre youtube", "busca un video", "ponme en youtube", "quiero ver"],
         "parametro_requerido": true,

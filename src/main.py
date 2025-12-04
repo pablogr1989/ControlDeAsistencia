@@ -15,63 +15,44 @@ def main():
     users = UserUtils.load_users(file_name)    
     login = Login(users)
     command_manager = CommandManager()     
-       
-    user = users['teivko']    
-    photo = facial.take_photo(user.nickname + ".png")
-    photo = facial.assign_color_profile(photo)
-    photo_code = facial.get_cod_face(photo)
     
-    print(f"Foto actual:\n{photo_code}")
-    print(f"\n\n")
-    print(f"Foto usuario:\n{user.face_code}")
-    
-    if facial.is_the_same(user.face_code, photo_code):
-        voice.talk(f"Bienvenido {user.name}")
-    
-    #UserUtils.save_users(users, file_name)
+    if login.login_user():    
+        try:
+            voice.talk(f"Sistema iniciado. Di Sistema para indicar cualquier comando")
+            command_manager.start_listen()
+            
+            while not command_manager.exit:
+                command = command_manager.get_next_command()
+                if command:
+                    print(f"Ejecutando: {command}")
+                else:
+                    time.sleep(0.1)
+                    
+        except KeyboardInterrupt:
+            # Esto captura si el usuario pulsa Ctrl+C en la consola
+            print("\nInterrupción de teclado detectada.")
+
+        finally:
+            print("Cerrando recursos...")
+            command_manager.stop_listen() 
+            UserUtils.save_users(users, file_name)
+            print("Programa terminado.")
         
-    return
-  
-    exit = False
-    command_list = []
+        return       
     
-    
-    
-    # try:
-    #     command_manager.start_listen()
+
         
-    #     while not command_manager.exit:
-    #         command = command_manager.get_next_command()
-    #         if command:
-    #             print(f"Ejecutando: {command['comando']}")
-    #         else:
-    #             time.sleep(0.1)
+    # while not exit:
+    #     # 1. Verificar si hay comandos
+    #     if command_list:            
+    #         with list_lock:
+    #             command = command_list.pop(0)
+    #             if command.get('comando') == "open_youtube":
+    #                 rec_voice.talk(command.get('frase_de_vuelta'))
+    #                 ejecutar_abrir_youtube(command['parametro'])
                 
-    # except KeyboardInterrupt:
-    #     # Esto captura si el usuario pulsa Ctrl+C en la consola
-    #     print("\nInterrupción de teclado detectada.")
-
-    # finally:
-
-    #     print("Cerrando recursos...")
-    #     command_manager.stop_listen() 
-    #     print("Programa terminado.")
-    
-    return       
-    
-
-        
-    while not exit:
-        # 1. Verificar si hay comandos
-        if command_list:            
-            with list_lock:
-                command = command_list.pop(0)
-                if command.get('comando') == "open_youtube":
-                    rec_voice.talk(command.get('frase_de_vuelta'))
-                    ejecutar_abrir_youtube(command['parametro'])
-                
-        else:
-            time.sleep(0.05)
+    #     else:
+    #         time.sleep(0.05)
         # end_time = time.time()
         # print(f"He tardado: {end_time-start_time}")
         # text = rec_voice.listen()

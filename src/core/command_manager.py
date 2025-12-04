@@ -46,8 +46,7 @@ class CommandManager:
                 self.exit = True
             
         except recognizer.UnknownValueError:
-            # No me ha entendido, pero no voy a decir nada
-            pass 
+            print("[ERROR] No he entendido lo que me has dicho")
         except recognizer.RequestError:
             print("[ERROR] Fallo en el servicio de transcripción de Google.")
         except Exception as e:

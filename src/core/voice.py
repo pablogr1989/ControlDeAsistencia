@@ -11,10 +11,12 @@ class Voice:
             cls._instance = super(Voice, cls).__new__(cls)
             cls._instance.sound = Sound()
             cls._instance.recognizer = sr.Recognizer()
-            cls._instance.recognizer.dynamic_energy_threshold = False
-            cls._instance.recognizer.energy_threshold = 4000
+            # cls._instance.recognizer.dynamic_energy_threshold = False
+            # cls._instance.recognizer.energy_threshold = 4000
             cls._instance.recognizer.pause_threshold = 0.8
-            cls._instance.micro = sr.Microphone()  
+            cls._instance.micro = sr.Microphone()
+            with cls._instance.micro as source:
+                cls._instance.recognizer.adjust_for_ambient_noise(source, duration=0.3)
         return cls._instance    
     
     def __init__(self):

@@ -14,7 +14,9 @@ def main():
     file_name = "users.json"
     users = UserUtils.load_users(file_name)    
     login = Login(users)
-    command_manager = CommandManager()     
+    command_manager = CommandManager()
+    
+    #input("Pulsa entero para empezar")
     
     if login.login_user():    
         try:
@@ -29,7 +31,6 @@ def main():
                     time.sleep(0.1)
                     
         except KeyboardInterrupt:
-            # Esto captura si el usuario pulsa Ctrl+C en la consola
             print("\nInterrupción de teclado detectada.")
 
         finally:

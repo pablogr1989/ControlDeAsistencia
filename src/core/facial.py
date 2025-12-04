@@ -17,6 +17,21 @@ class Facial:
     
     def __init__(self):
         pass        
+    
+    def open_webcam(self):
+        while True:
+            ret, frame = self.camara.read()
+            # Si el fotograma se leyó correctamente, mostrarlo
+            if ret:
+                imS = self.resize_with_aspect_ratio(frame, width=480) 
+                cv2.imshow('Webcam', imS)
+
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    cv2.destroyAllWindows()
+                    return frame
+            else:
+                print("Error: No se pudo leer el fotograma.")
+                break
         
     def take_photo(self, file_name):
         self.sound.play_sound(self.sound.START_SOUND)
@@ -41,3 +56,18 @@ class Facial:
     def is_the_same(self, user_code, photo_code):
         results = fr.compare_faces([user_code], photo_code)
         return results[0]
+    
+    def resize_with_aspect_ratio(self, image, width=None, height=None, inter=cv2.INTER_AREA):
+        dim = None
+        (h, w) = image.shape[:2]
+
+        if width is None and height is None:
+            return image
+        if width is None:
+            r = height / float(h)
+            dim = (int(w * r), height)
+        else:
+            r = width / float(w)
+            dim = (width, int(h * r))
+
+        return cv2.resize(image, dim, interpolation=inter)

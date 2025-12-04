@@ -105,6 +105,7 @@ class Login:
         self.user_logged = user
         self.users[nickname] = user
         self.voice.talk(f"Usuario {nickname} registrado.")
+        UserUtils.save_users(self.users, "users.json")
         return True
             
     def _register_nickname(self):
@@ -160,7 +161,8 @@ class Login:
     def _register_photo(self):
         self.voice.talk(f"Ahora vamos a registrar tu cara en el sistema. Colocate delante de la camara en cuanto suene el primer pitito. Despues espera a un segundo antes de quitarte")
         time.sleep(0.5)
-        photo = self.facial.take_photo("user.png")
+        #photo = self.facial.take_photo("user.png")
+        photo = self.facial.open_webcam()
         photo = self.facial.assign_color_profile(photo)
         photo_code = self.facial.get_cod_face(photo)
         return photo_code

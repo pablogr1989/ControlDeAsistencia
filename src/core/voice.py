@@ -50,7 +50,7 @@ class Voice:
             
         # self.recognizer.energy_threshold = self.recognizer.energy_threshold * 100
         # self.recognizer.pause_threshold = 2
-        # self.recognizer.non_speaking_duration = 2
+        self.recognizer.non_speaking_duration = 2
         self.recognizer.pause_threshold = 1
             
     def talk(self, msg):

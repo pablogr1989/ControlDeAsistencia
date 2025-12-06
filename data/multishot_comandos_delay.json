@@ -1,0 +1,50 @@
+[
+  {
+    "role": "user",
+    "content": "Ponme un tutorial de Python en YouTube."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"open_youtube\",\n      \"parametros\": {\n        \"valor\": \"tutorial de Python\"\n      },\n      \"despues_de\": null\n    }\n  ]\n}"
+  },
+  {
+    "role": "user",
+    "content": "Abre la calculadora dentro de 15 minutos."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"run_program\",\n      \"parametros\": {\n        \"valor\": \"calculadora\"\n      },\n      \"despues_de\": null,\n      \"delay\": {\n        \"tipo\": \"temporizador\",\n        \"valor\": 15,\n        \"medida\": \"minutos\"\n      }\n    }\n  ]\n}"
+  },
+  {
+    "role": "user",
+    "content": "Ponme una canción de rock en YouTube a las 18:30."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"open_youtube\",\n      \"parametros\": {\n        \"valor\": \"canci\\u00f3n de rock\"\n      },\n      \"despues_de\": null,\n      \"delay\": {\n        \"tipo\": \"tiempo\",\n        \"valor\": \"18:30\",\n        \"medida\": null\n      }\n    }\n  ]\n}"
+  },
+  {
+    "role": "user",
+    "content": "Primero ábreme Unity y luego ponme un tutorial de shaders en YouTube en 20 minutos."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"run_program\",\n      \"parametros\": {\n        \"valor\": \"Unity\"\n      },\n      \"despues_de\": null\n    },\n    {\n      \"id\": 2,\n      \"comando\": \"open_youtube\",\n      \"parametros\": {\n        \"valor\": \"tutorial de shaders\"\n      },\n      \"despues_de\": 1,\n      \"delay\": {\n        \"tipo\": \"temporizador\",\n        \"valor\": 20,\n        \"medida\": \"minutos\"\n      }\n    }\n  ]\n}"
+  },
+  {
+    "role": "user",
+    "content": "Ábreme Spotify y a las 22:00 ponme un vídeo de relajación en YouTube."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"run_program\",\n      \"parametros\": {\n        \"valor\": \"Spotify\"\n      },\n      \"despues_de\": null\n    },\n    {\n      \"id\": 2,\n      \"comando\": \"open_youtube\",\n      \"parametros\": {\n        \"valor\": \"v\\u00eddeo de relajaci\\u00f3n\"\n      },\n      \"despues_de\": 1,\n      \"delay\": {\n        \"tipo\": \"tiempo\",\n        \"valor\": \"22:00\",\n        \"medida\": null\n      }\n    }\n  ]\n}"
+  },
+  {
+    "role": "user",
+    "content": "Ponme música ambiental en YouTube y abre Unity."
+  },
+  {
+    "role": "assistant",
+    "content": "{\n  \"comandos\": [\n    {\n      \"id\": 1,\n      \"comando\": \"open_youtube\",\n      \"parametros\": {\n        \"valor\": \"m\\u00fasica ambiental\"\n      },\n      \"despues_de\": null\n    },\n    {\n      \"id\": 2,\n      \"comando\": \"run_program\",\n      \"parametros\": {\n        \"valor\": \"Unity\"\n      },\n      \"despues_de\": null\n    }\n  ]\n}"
+  }
+]

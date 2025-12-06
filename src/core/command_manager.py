@@ -1,3 +1,4 @@
+import speech_recognition as sr
 from utils.file_manager import *
 from utils.command_actions import *
 from core.openai_client import OpenAIClient
@@ -6,6 +7,20 @@ from core.voice import Voice
 import threading
 from utils.audio_phrases import *
 import json
+from urllib.parse import quote_plus
+from utils.time_utils import *
+
+class Command:
+    def __init__(self):
+        self.comando = None
+        self.parametros = None
+        self.delay = False
+        self.delayType = None
+        self.delayValue = None
+        self.timeUnit = None
+        
+    def print(self):
+        return f"<Command: {self.comando} | Params: {self.parametros} | Delay: {self.delay} ({self.delayValue} {self.timeUnit})>"
 
 class CommandManager:
     
@@ -18,7 +33,12 @@ class CommandManager:
         self.voice = Voice()
         self.exit = False
         self.stop_listening_func = None
-        pass
+        self.actions = {
+            "open_youtube": ejecutar_abrir_youtube,
+            "run_program": ejecutar_programa,
+            "set_alarm": ejecutar_alarma
+        }
+    
     
     def start_listen(self):                
         self.stop_listening_func = self.voice.recognizer.listen_in_background(self.voice.micro, self._background_processor)
@@ -35,7 +55,7 @@ class CommandManager:
             if any(phrase in text for phrase in get_wake_phrases()):
                 #response = self.ollama.call_ollama(commands=self.commands, audio_text=text)
                 response = self.openai.call_openai(commands=self.commands, audio_text=text)
-                print(f"OpenAI responde:\n {response}")
+                #print(f"OpenAI responde:\n {response}")
                 commands = self.extract_commands(response)
                 with self.list_lock:
                     for cmd in commands:
@@ -44,11 +64,11 @@ class CommandManager:
             if any(phrase in text for phrase in get_exit_phrases()):
                 print("Veo que quieres salir")
                 self.exit = True
-            
-        except recognizer.UnknownValueError:
-            print("[ERROR] No he entendido lo que me has dicho")
-        except recognizer.RequestError:
-            print("[ERROR] Fallo en el servicio de transcripción de Google.")
+                
+        except sr.UnknownValueError:
+            pass
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))      
         except Exception as e:
             print(f"[ERROR] Procesando audio en fondo: {e}")
             
@@ -56,55 +76,87 @@ class CommandManager:
         with self.list_lock:
             if self.command_list:
                 return self.command_list.pop(0)
-        return None
-
-    def extract_commands(self, response):
-        # --- 1. Asegurar que data es un diccionario ---
-        if isinstance(response, dict):
-            data = response
-
-        else:
-            try:
-                data = json.loads(response)
-            except Exception as e:
-                print(f"[ERROR] JSON inválido del LLM: {e}")
-                return []
-
-        comandos = data.get("comandos", [])
-        if not isinstance(comandos, list):
-            print("[ERROR] Formato de comandos inválido en la respuesta.")
+        return None   
+    
+    def extract_commands(self, mensaje):
+        try:
+            #content_str = mensaje.get("content", "{}")
+            data = mensaje
+            raw_commands = data.get("comandos", [])
+        except json.JSONDecodeError:
+            print("Error: El contenido no es un JSON válido.")
             return []
 
-        # Si vienen en formato simple (tu ejemplo)
-        # {'comando': 'xx', 'parametro': 'yy'}
-        # lo convierte al formato estándar
-        for cmd in comandos:
-            if "parametros" not in cmd:
-                cmd["parametros"] = {"valor": cmd.get("parametro")}
-            if "despues_de" not in cmd:
-                cmd["despues_de"] = None
+        command_map = {}  
+        dependency_map = {} 
 
-        # --- 2. Ordenar según dependencias ---
-        ordered = []
-        pendientes = {i: cmd for i, cmd in enumerate(comandos, start=1)}
-        ejecutados = set()
+        for item in raw_commands:
+            cmd = Command()
+            cmd.comando = item.get("comando")
+            cmd.parametros = item.get("parametros", {}) 
+            
+            # Procesar delay si existe
+            if "delay" in item and item["delay"]:
+                cmd.delay = True
+                cmd.delayType = item["delay"].get("tipo")
+                cmd.delayValue = item["delay"].get("valor")
+                cmd.timeUnit = item["delay"].get("medida")
+            
+            cmd_id = item.get("id")
+            parent_id = item.get("despues_de")
+            
+            command_map[cmd_id] = cmd
+            dependency_map[cmd_id] = parent_id
 
-        while pendientes:
-            progreso = False
+        ordered_commands = []
+        processed_ids = set()
 
-            for cmd_id, cmd in list(pendientes.items()):
-                depende = cmd.get("despues_de")
-
-                if depende is not None and depende not in ejecutados:
+        # Repetimos mientras queden comandos por procesar
+        while len(ordered_commands) < len(command_map):
+            progress = False
+            
+            for cmd_id, cmd in command_map.items():
+                if cmd_id in processed_ids:
                     continue
-
-                ordered.append(cmd)
-                ejecutados.add(cmd_id)
-                del pendientes[cmd_id]
-                progreso = True
-
-            if not progreso:
-                print("[ERROR] Dependencias circulares.")
+                
+                parent_id = dependency_map[cmd_id]
+                
+                # Un comando está listo si no tienen dependencias, o si ya la hemos procesado
+                if parent_id is None or parent_id in processed_ids:
+                    ordered_commands.append(cmd)
+                    processed_ids.add(cmd_id)
+                    progress = True
+            
+            if not progress:
+                # Evitar bucle infinito si hay dependencias circulares o IDs inexistentes
+                print("Error: Dependencia circular o ID faltante detectado.")
                 break
+        
+        return ordered_commands
+        
+    def process_command(self, cmd):
+        if cmd.delay and cmd.delayValue:
+            if cmd.delayType == "temporizador":
+                seconds = convert_to_seconds(cmd.delayValue, cmd.timeUnit)
+                print(f"--> Programando '{cmd.comando}' en {seconds} segundos...")
+            elif cmd.delayType == "tiempo":
+                seconds = convert_time_to_seconds(cmd.delayValue)
+            
+            # Ejecución no bloqueante en hilo aparte
+            timer = threading.Timer(seconds, self._dispatch, args=[cmd])
+            timer.start()
+        else:
+            # Ejecución inmediata
+            self._dispatch(cmd)
+            
 
-        return ordered
+    def _dispatch(self, cmd):
+        action_func = self.actions.get(cmd.comando)        
+        if action_func:
+            valor = cmd.parametros.get("valor", "")
+            try:
+                action_func(valor)
+            except Exception as e:
+                print(f"Error ejecutando {cmd.comando}: {e}")
+        else:
+            print(f"Advertencia: Comando '{cmd.comando}' no implementado.")

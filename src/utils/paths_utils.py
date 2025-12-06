@@ -15,11 +15,6 @@ def get_config_path(filename=".env"):
 def get_prompts_path(filename):
     return os.path.join(get_project_root(), "prompts", filename)
 
-
-def get_outputs_path(filename):
-    return os.path.join(get_project_root(), "outputs", filename)
-
-
 def get_data_path(filename):
     return os.path.join(get_project_root(), "data", filename)
 

@@ -60,24 +60,16 @@ class Login:
         self.voice = Voice()
         self.facial = Facial()
         
-    def login_user(self):
-        if len(self.users) > 0:
+    def login_user(self):        
+        if len(self.users) > 0:                
+            self.voice.talk("Bienvenido al sistema. Espere un momento mientras verificamos su acceso")            
             user = self.check_face()
-            if user is not None:
+            if user:
+                self.voice.talk(f"Bienvenido {user.name} al sistema")
                 self.user_logged = user
-                self.voice.talk(f"Bivenido al sistema {user.name}")
                 return True
-                
-            self.voice.talk("Bienvenido. Digame su nombre de usuario")
-            user_name = self.voice.listen().replace(" ", "")
-            
-            if user_name in self.users:
-                self.user_logged = self.users[user_name]
-                self.voice.talk(f"Inicio de sesion correcto. Buenos dias {self.user_logged.name}. Por favor pongase delante de la camara para verificar que es usted")
-                if self.check_user_face(self.user_logged):
-                    self.voice.talk(f"Perfecto {self.user_logged.name} ya esta logueado en el sistema")
             else:
-                self.voice.talk(f"El nombre del usuario {user_name} no existe en la base de datos. ¿Quiere registrarte?")
+                self.voice.talk(f"No estas registrado en el sistema ¿Quiere registrarte?")
                 confirmation = self.voice.listen()
                 if any(phrase in confirmation for phrase in get_confirmation_phrases()):
                     self.voice.talk(f"Perfecto, vamos a registrarte")
@@ -100,13 +92,19 @@ class Login:
         name = self._register_name()
         last_name = self._register_last_name()
         photo_code = self._register_photo()
-        user = User()
-        user.initialize(nick=nickname, name=name, last_name=last_name, face_code=photo_code)
-        self.user_logged = user
-        self.users[nickname] = user
-        self.voice.talk(f"Usuario {nickname} registrado.")
-        UserUtils.save_users(self.users, "users.json")
-        return True
+        
+        if photo_code is not None:
+            user = User()
+            user.initialize(nick=nickname, name=name, last_name=last_name, face_code=photo_code)
+            self.user_logged = user
+            self.users[nickname] = user
+            self.voice.talk(f"Usuario {nickname} registrado.")
+            UserUtils.save_users(self.users, "users.json")
+            return True
+        else:
+            self.voice.talk(f"Ha habido un error al reconocer tu cara. Se cancela el registro del usuario")
+        
+        return False
             
     def _register_nickname(self):
         exit = False
@@ -159,37 +157,46 @@ class Login:
         return last_name
     
     def _register_photo(self):
-        self.voice.talk(f"Ahora vamos a registrar tu cara en el sistema. Colocate delante de la camara en cuanto suene el primer pitito. Despues espera a un segundo antes de quitarte")
+        self.voice.talk(f"Ahora vamos a registrar tu cara. Por favor, espere unos segundos delante de la camara sin quitarse")
         time.sleep(0.5)
-        #photo = self.facial.take_photo("user.png")
-        photo = self.facial.open_webcam()
-        photo = self.facial.assign_color_profile(photo)
-        photo_code = self.facial.get_cod_face(photo)
-        return photo_code
+        photo = self.facial.take_single_face()
+        if photo is not None:
+            photo = self.facial.assign_color_profile(photo)
+            photo_code = self.facial.get_cod_face(photo)
+            return photo_code[0]
+
+        return None
             
     def check_face(self):
-        photo = self.facial.take_photo("user.png")
-        photo = self.facial.assign_color_profile(photo)
-        photo_code = self.facial.get_cod_face(photo)
+        photos = self.facial.take_photo()
         
-        if photo_code is not None:        
-            for user in self.users.values():
-                if user.face_code is not None and self.facial.is_the_same(user.face_code, photo_code):
-                    return user            
-            return None
+        if photos is not None:
+            photos = self.facial.assign_color_profile(photos)
+            photo_codes = self.facial.get_cod_face(photos)
+            
+            if photo_codes is not None:       
+                for code in photo_codes:
+                    for user in self.users.values():
+                        if user.face_code is not None and self.facial.is_the_same(user.face_code, code):
+                            return user
         else:
-            return None
+            self.voice.talk(f"Ha habido un error al reconocer tu cara.")
+                               
+        return None
         
     def check_user_face(self, user):
-        photo = self.facial.take_photo("user.png")
-        photo = self.facial.assign_color_profile(photo)
-        photo_code = self.facial.get_cod_face(photo)
+        photo = self.facial.take_photo()
+        if photo is not None:
+            photo = self.facial.assign_color_profile(photo)
+            photo_codes = self.facial.get_cod_face(photo)
+            
+            if photo_codes is not None:        
+                for code in photo_codes:
+                    if user.face_code is not None and self.facial.is_the_same(user.face_code, code):
+                        return True
         
-        if photo_code is not None:        
-            if user.face_code is not None and self.facial.is_the_same(user.face_code, photo_code):
-                return True
-        else:
-            return False
+        self.voice.talk(f"Ha habido un error al reconocer tu cara.")            
+        return False
         
     def _exist_users(self):
         return len(self.users) > 0
@@ -219,26 +226,3 @@ class UserUtils:
     def print_users(users):
         for user in users.values():
             user.print_info()
-    
-    
-class Register:
-    def __init__(self):
-        pass
-    
-    
-        # def record_words(self):
-    #     stop = False
-    #     while not stop:
-    #         #Activar el micro y guardar la request en un string
-    #         self.talk("Bienvenido. Digame su nombre de usuario")
-    #         usuario = self.listen().lower()
-    #         usuario = unidecode(usuario)
-    #         print(f"Su usuario es {usuario}")
-    #         self.talk(f"Es su nombre de usuario {usuario}")
-    #         confirmation = self.listen().lower()
-    #         confirmation = unidecode(confirmation)
-    #         print(f"Confirmacion: {confirmation}")
-    #         if "si" in confirmation:
-    #             self.registered_users.append({"User": usuario})
-    #             save_users(self.registered_users)
-    #             stop = True

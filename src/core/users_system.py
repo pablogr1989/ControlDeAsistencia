@@ -5,6 +5,9 @@ import numpy as np
 from unidecode import unidecode
 from utils.audio_phrases import *
 import time
+from core.openai_client import OpenAIClient
+import random
+from utils.file_manager import load_data
 
 class User:
     def __init__(self):
@@ -167,22 +170,34 @@ class Login:
 
         return None
             
-    def check_face(self):
-        photos = self.facial.take_photo()
-        
-        if photos is not None:
-            photos = self.facial.assign_color_profile(photos)
-            photo_codes = self.facial.get_cod_face(photos)
+    def check_face(self):        
+        selected_phrase = self._load_facial_phrase()
+                
+        self.voice.talk(selected_phrase["instruction"])
+                
+        while True:      
+            original_photo = self.facial.take_photo()
             
-            if photo_codes is not None:       
-                for code in photo_codes:
-                    for user in self.users.values():
-                        if user.face_code is not None and self.facial.is_the_same(user.face_code, code):
-                            return user
-        else:
-            self.voice.talk(f"Ha habido un error al reconocer tu cara.")
+            if original_photo is not None:
+                photo = self.facial.assign_color_profile(original_photo)
+                photo_codes = self.facial.get_cod_face(photo)
+                
+                if photo_codes is not None:       
+                    for code in photo_codes:
+                        for user in self.users.values():
+                            if user.face_code is not None and self.facial.is_the_same(user.face_code, code):
+                                openai = OpenAIClient()
+                                self.voice.talk("Usuario correcto. Espere un momento, estamos verificando el gesto")
+                                resp = openai.send_image(selected_phrase["prompt"], original_photo)
+                                if "<si>" in unidecode(resp).lower():                                    
+                                    return user
+                                else:
+                                    self.voice.talk("El usuario es correcto, pero no se ha podido verificar el gesto. Por favor intentelo de nuevo")
+            else:
+                self.voice.talk(f"Ha habido un error al reconocer tu cara.")
                                
         return None
+
         
     def check_user_face(self, user):
         photo = self.facial.take_photo()
@@ -200,6 +215,20 @@ class Login:
         
     def _exist_users(self):
         return len(self.users) > 0
+    
+    def _load_facial_phrase(self):
+        facial_phrases = load_data("facial_phrases.json")
+        
+        if not facial_phrases:
+            # Por si falla el archivo
+            selected_phrase = {
+                "instruction": "Por favor, muestre tres dedos.",
+                "prompt": "¿Está la persona mostrando 3 dedos?"
+            }
+        else:
+            selected_phrase = random.choice(facial_phrases)
+            
+        return selected_phrase
     
     
 class UserUtils:    

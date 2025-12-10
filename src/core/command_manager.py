@@ -54,7 +54,7 @@ class CommandManager:
             print(text)
             if any(phrase in text for phrase in get_wake_phrases()):
                 #response = self.ollama.call_ollama(commands=self.commands, audio_text=text)
-                response = self.openai.call_openai(commands=self.commands, audio_text=text)
+                response = self.openai.send_commands(commands=self.commands, audio_text=text)
                 #print(f"OpenAI responde:\n {response}")
                 commands = self.extract_commands(response)
                 with self.list_lock:

@@ -5,6 +5,7 @@ from utils.paths_utils import *
 from core.users_system import Login, UserUtils
 from core.command_manager import CommandManager
 from core.attendance_system import AttendanceManager
+from core.openai_client import OpenAIClient
 import time
 
 def main():
@@ -15,6 +16,7 @@ def main():
     voice = Voice()
     facial = Facial()
     sound_player = Sound()
+    openai = OpenAIClient()
     users = UserUtils.load_users("users.json")    
     login = Login(users)
     command_manager = CommandManager()

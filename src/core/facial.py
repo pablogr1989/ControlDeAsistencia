@@ -62,7 +62,7 @@ class Facial:
                     elapsed_time = time.time() - success_start
                     
                     # ÉXITO: 3 segundos
-                    if elapsed_time >= 3:
+                    if elapsed_time >= 5:
                         self.sound.play_sound(self.sound.END_SOUND)
                         cv2.destroyAllWindows()
                         return frame
@@ -108,7 +108,7 @@ class Facial:
     def take_photo(self):
         init_time = time.time()
         start_time = None
-        abort_time = None
+        abort_time = time.time()
         last_reported_sec = 0
         last_noface_sec = 0
         
@@ -131,6 +131,7 @@ class Facial:
                         self.sound.play_sound(self.sound.END_SOUND)
                         cv2.destroyAllWindows()
                         time.sleep(1)
+                        cv2.imwrite(get_photos_path("user.png"), frame)
                         return frame
                     
                     if int(elapsed_time) > last_reported_sec:
@@ -151,7 +152,7 @@ class Facial:
                         elapsed_time = time.time() - abort_time
                         last_noface_sec = int(elapsed_time)
                     
-                imS = self.resize_with_aspect_ratio(frame, width=480) 
+                imS = self.resize_with_aspect_ratio(frame, width=720) 
                 cv2.imshow('Webcam', imS)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):

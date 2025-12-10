@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "instruction": "Por favor, levanta la mano mostrando exactamente dos dedos.",
+    "prompt": "¿Está la persona en la imagen mostrando exactamente dos dedos levantados con una mano?"
+  },
+  {
+    "id": 2,
+    "instruction": "Por favor, cierra el puño y muéstralo a la cámara.",
+    "prompt": "¿Está la persona mostrando un puño cerrado hacia la cámara?"
+  },
+  {
+    "id": 3,
+    "instruction": "Por favor, haz el simbolo de victoria con una mano.",
+    "prompt": "¿Está la persona haciendo el simbolo de la victoria?"
+  },
+  {
+    "id": 4,
+    "instruction": "Por favor, haz un gesto de pulgar hacia arriba.",
+    "prompt": "¿Está la persona haciendo el gesto de pulgar arriba con la mano?"
+  },
+  {
+    "id": 5,
+    "instruction": "Por favor, tócate la nariz con el dedo índice.",
+    "prompt": "¿Está la persona tocándose la nariz con el dedo índice?"
+  },
+  {
+    "id": 6,
+    "instruction": "Por favor, cogete la oreja con una mano",
+    "prompt": "¿Está la persona cogiendose una oreja con una mano?"
+  }
+]

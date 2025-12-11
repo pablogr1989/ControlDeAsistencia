@@ -16,11 +16,17 @@
     "encadenable": true
   },
   {
-    "comando": "run_program",
-    "intenciones": ["abre el programa", "ejecuta", "lanza"],
+    "comando": "play_spotify",
+    "intenciones": [
+      "pon musica", 
+      "reproducir cancion", 
+      "ponme algo de", 
+      "escuchar en spotify",
+      "pon"
+    ],
     "parametro_requerido": true,
-    "descripcion_parametro": "Ruta o nombre del programa.",
-    "instruccion_llm": "Debe devolver solo el nombre o ruta limpia.",
+    "descripcion_parametro": "El nombre de la canción, artista o álbum que el usuario quiere escuchar.",
+    "instruccion_llm": "Extrae el nombre de la canción o artista. Si dice 'pon musica de acdc', el parametro es 'acdc'.",
     "encadenable": true
   },
   {

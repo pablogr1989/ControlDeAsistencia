@@ -36,7 +36,8 @@ class CommandManager:
         self.actions = {
             "open_youtube": ejecutar_abrir_youtube,
             "run_program": ejecutar_programa,
-            "set_alarm": ejecutar_alarma
+            "set_alarm": ejecutar_alarma,
+            "play_spotify": ejecutar_reproducir_spotify
         }
     
     

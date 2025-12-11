@@ -13,8 +13,7 @@ PROGRAMAS = {
     "calculadora": "calc.exe",
     "bloc de notas": "notepad.exe",
     "paint": "mspaint.exe",
-    "navegador": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-    "spotify": "C:\\Program Files\\WindowsApps\\SpotifyAB.SpotifyMusic_1.278.418.0_x64__zpdnekdrzrea0\\Spotify.exe"
+    "navegador": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 }
 
 def ejecutar_abrir_youtube(parametro_busqueda: str):
@@ -83,3 +82,20 @@ def _sonar_pitidos_alarma(tiempo_original):
             time.sleep(0.1)
     except Exception:
         print("\a" * 5) # Fallback
+        
+def ejecutar_reproducir_spotify(cancion):
+    if not cancion:
+        print("ERROR: No se ha especificado ninguna canción.")
+        return
+
+    print(f"[ACCION] Buscando en Spotify: {cancion}")
+    
+    # Codificamos la búsqueda (espacios -> +)
+    busqueda_codificada = quote_plus(cancion)
+    
+    # Usamos el esquema URI de Spotify para búsqueda
+    # Esto abrirá la app directamente en la página de resultados
+    url_spotify = f"spotify:search:{busqueda_codificada}"
+    
+    # webbrowser detectará el protocolo "spotify:" y lanzará la app de escritorio
+    webbrowser.open(url_spotify)

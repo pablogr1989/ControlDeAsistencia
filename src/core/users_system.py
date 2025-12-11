@@ -84,7 +84,7 @@ class Login:
                     self.voice.talk(f"Perfecto, vamos a registrarte")
                     return self.register_user()
                 else:
-                    self.voice.talk(f"Pues hasta luego")
+                    self.voice.talk(f"Es una pena, espero volver a verte")
                     return False
         else:
             self.voice.talk(f"No hay registrados usuarios nuevos. ¿Quieres registrarte?")
@@ -93,7 +93,7 @@ class Login:
                 self.voice.talk(f"Perfecto, vamos a registrarte")
                 return self.register_user()
             else:
-                self.voice.talk(f"Pues hasta luego")
+                self.voice.talk(f"Es una pena, espero volver a verte")
                 return False
                 
     def register_user(self):
@@ -173,8 +173,8 @@ class Login:
             photo = self.facial.assign_color_profile(photo)
             photo_code = self.facial.get_cod_face(photo)
             return photo_code[0]
-
         return None
+                        
             
     def check_face(self):        
         selected_phrase = self._load_facial_phrase()
@@ -199,8 +199,8 @@ class Login:
                                     return user
                                 else:
                                     self.voice.talk("El usuario es correcto, pero no se ha podido verificar el gesto. Por favor intentelo de nuevo")
-                            else:
-                                return None
+                    
+                    return None
                                 
             else:
                 self.voice.talk(f"Ha habido un error al reconocer tu cara. Intentelo de nuevo")

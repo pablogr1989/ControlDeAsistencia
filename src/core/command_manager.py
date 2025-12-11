@@ -2,7 +2,7 @@ import speech_recognition as sr
 from utils.file_manager import *
 from utils.command_actions import *
 from core.openai_client import OpenAIClient
-from core.ollama_client import OllamaClient
+#from core.ollama_client import OllamaClient
 from core.voice import Voice
 import threading
 from utils.audio_phrases import *
@@ -29,7 +29,7 @@ class CommandManager:
         self.command_list = []
         self.list_lock = threading.Lock()
         self.openai = OpenAIClient()
-        self.ollama = OllamaClient()
+        #self.ollama = OllamaClient()
         self.voice = Voice()
         self.exit = False
         self.stop_listening_func = None

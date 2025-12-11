@@ -183,17 +183,6 @@ class Facial:
             return locations
         else:
             return None
-        
-    # def take_photo(self, file_name):
-    #     self.sound.play_sound(self.sound.START_SOUND)
-    #     time.sleep(0.5)
-    #     exito, frame = self.camara.read()
-    #     self.sound.play_sound(self.sound.END_SOUND)
-    #     if exito:
-    #         return frame
-        
-    #     print("ERROR: No he hecho foto")
-    #     return None
 
     def assign_color_profile(self, photo):
         return cv2.cvtColor(photo, cv2.COLOR_BGR2RGB)

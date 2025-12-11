@@ -12,7 +12,7 @@ class Voice:
                 cls._instance.sound = Sound()
                 cls._instance.recognizer = sr.Recognizer()
                 cls._instance.recognizer.pause_threshold = 0.8
-                
+                                
                 try:
                     cls._instance.micro = sr.Microphone()
                     
@@ -20,17 +20,14 @@ class Voice:
                         cls._instance.recognizer.adjust_for_ambient_noise(source, duration=0.3)
                         
                 except OSError as e:
-                    raise RuntimeError(f"ERROR CRÍTICO: No se detecta ningún micrófono conectado o configurado.")
+                    raise RuntimeError(f"No se detecta ningún micrófono conectado o configurado.")
                 except Exception as e:
                     raise RuntimeError(f"Error inesperado al iniciar el micrófono: {e}")
                     
-            return cls._instance
-                
-          
+            return cls._instance              
     
     def __init__(self):
         pass
-
             
     def listen(self):
         with self.micro as origin:                        

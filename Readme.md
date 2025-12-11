@@ -109,9 +109,7 @@ python src/main.py
 
 ### Asistente de Voz
 
-Una vez logueado, di "Hey Sistema" o "Sistema despierta".
-
-Espera el pitido y di tu comando.
+Una vez logueado, di "Hey Sistema" o "Sistema despierta" y di tu comando
 
 **Ejemplos:**
 

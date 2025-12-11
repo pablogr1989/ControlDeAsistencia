@@ -21,9 +21,10 @@ def main():
     login = Login(users)
     command_manager = CommandManager()
     
-    if login.login_user():    
+    #if login.login_user():    
+    if True:
         try:
-            attendance.register_entry(login.user_logged)
+            #attendance.register_entry(login.user_logged)
             voice.talk(f"Sistema de comandos activado. Di Sistema para indicar cualquier comando")
             command_manager.start_listen()
             

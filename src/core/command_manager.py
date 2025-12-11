@@ -41,7 +41,8 @@ class CommandManager:
         }
     
     
-    def start_listen(self):                
+    def start_listen(self):              
+        self.voice.set_mode_background()  
         self.stop_listening_func = self.voice.recognizer.listen_in_background(self.voice.micro, self._background_processor)
         
     def stop_listen(self):

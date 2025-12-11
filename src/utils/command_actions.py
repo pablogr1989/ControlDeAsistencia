@@ -8,6 +8,8 @@ import time
 import sys
 import threading
 import winsound
+import pyautogui
+from core.spotify_client import SpotifyClient
 
 PROGRAMAS = {
     "calculadora": "calc.exe",
@@ -87,15 +89,7 @@ def ejecutar_reproducir_spotify(cancion):
     if not cancion:
         print("ERROR: No se ha especificado ninguna canción.")
         return
-
-    print(f"[ACCION] Buscando en Spotify: {cancion}")
     
-    # Codificamos la búsqueda (espacios -> +)
-    busqueda_codificada = quote_plus(cancion)
-    
-    # Usamos el esquema URI de Spotify para búsqueda
-    # Esto abrirá la app directamente en la página de resultados
-    url_spotify = f"spotify:search:{busqueda_codificada}"
-    
-    # webbrowser detectará el protocolo "spotify:" y lanzará la app de escritorio
-    webbrowser.open(url_spotify)
+    client = SpotifyClient()
+    result = client.play_song(cancion)
+    print(result)

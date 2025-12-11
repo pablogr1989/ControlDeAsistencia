@@ -1,4 +1,7 @@
-# 1) Imports que necesitas
+# CLASE DEPRECATED POR AHORA
+
+
+# Imports que necesitas
 import requests
 import json
 
@@ -15,7 +18,7 @@ class OllamaClient:
             {"role": "user", "content": self._build_user_message(audio_text, commands)}
         ]
 
-        # 4) Construcción del payload
+        # Construcción del payload
         payload = {
             "model": self.MODEL,
             "messages": messages,

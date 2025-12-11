@@ -7,24 +7,33 @@ from core.command_manager import CommandManager
 from core.attendance_system import AttendanceManager
 from core.openai_client import OpenAIClient
 import time
+import sys
 
 def main():
     print("============================================")
     print("=          CONTROL DE ASISTENCIA           =")
-    print("============================================")
-    attendance = AttendanceManager()
-    voice = Voice()
-    facial = Facial()
-    sound_player = Sound()
-    openai = OpenAIClient()
-    users = UserUtils.load_users("users.json")    
-    login = Login(users)
-    command_manager = CommandManager()
+    print("============================================")    
+    try:    
+        attendance = AttendanceManager()
+        voice = Voice()
+        facial = Facial()
+        sound_player = Sound()
+        openai = OpenAIClient()
+        users = UserUtils.load_users("users.json")    
+        login = Login(users)
+        command_manager = CommandManager()
+        
+    except RuntimeError as e:
+        print(f"\n[ERROR CRÍTICO] {e}")
+        print("No se puede iniciar el sistema. Cerrando aplicación...")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
+        sys.exit(1)
     
-    #if login.login_user():    
-    if True:
+    if login.login_user():
         try:
-            #attendance.register_entry(login.user_logged)
+            attendance.register_entry(login.user_logged)
             voice.talk(f"Sistema de comandos activado. Di Sistema para indicar cualquier comando")
             command_manager.start_listen()
             
@@ -40,10 +49,11 @@ def main():
             print("\nInterrupción de teclado detectada.")
 
         finally:
-            print("Cerrando recursos...")
+            voice.talk(f"Cerrando el sistema de reconocimiento de comandos...")
             command_manager.stop_listen()
-            print("Programa terminado.")
-        
+            time.sleep(1)
+            voice.talk(f"Hasta la vista")
+            time.sleep(1)        
         return
 
 if __name__ == '__main__':

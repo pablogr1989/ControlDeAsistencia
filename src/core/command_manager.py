@@ -33,6 +33,7 @@ class CommandManager:
         self.voice = Voice()
         self.exit = False
         self.stop_listening_func = None
+        # Lista de funciones que se llamaran dependiendo del comando que chatgpt mande
         self.actions = {
             "open_youtube": ejecutar_abrir_youtube,
             "run_program": ejecutar_programa,
@@ -82,7 +83,6 @@ class CommandManager:
     
     def extract_commands(self, mensaje):
         try:
-            #content_str = mensaje.get("content", "{}")
             data = mensaje
             raw_commands = data.get("comandos", [])
         except json.JSONDecodeError:
@@ -97,7 +97,7 @@ class CommandManager:
             cmd.comando = item.get("comando")
             cmd.parametros = item.get("parametros", {}) 
             
-            # Procesar delay si existe
+            # Si es un comando a ejecutar en un tiempo determinado...
             if "delay" in item and item["delay"]:
                 cmd.delay = True
                 cmd.delayType = item["delay"].get("tipo")
@@ -144,7 +144,6 @@ class CommandManager:
             elif cmd.delayType == "tiempo":
                 seconds = convert_time_to_seconds(cmd.delayValue)
             
-            # Ejecución no bloqueante en hilo aparte
             timer = threading.Timer(seconds, self._dispatch, args=[cmd])
             timer.start()
         else:

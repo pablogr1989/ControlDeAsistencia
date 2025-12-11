@@ -44,8 +44,11 @@ class OpenAIClient:
         messages.append({"role": "user", "content": audio_text})
         
         print(messages)
-        
+    
     def send_image(self, text, image, model="gpt-4.1", max_tokens=100, temperature=0.2):
+        '''
+        Llamada a openai para verificar que el gesto de la foto es el que se pide
+        '''
                 
         sucess, buffer = cv2.imencode('.png', image)
         base64_image = base64.b64encode(buffer).decode('utf-8')
@@ -110,6 +113,9 @@ class OpenAIClient:
 
     
     def send_commands(self, audio_text, commands, model="gpt-4.1", max_tokens=1000, temperature=0.7):
+        '''
+        Funcion para mandar a openai el texto transcrito para comprobar si hay algun comando que ejecutar
+        '''
         
         commands_json = json.dumps(commands, ensure_ascii=False, indent=2)
         system_prompt = read_file(get_prompts_path("system_prompt.md"))
@@ -127,7 +133,7 @@ class OpenAIClient:
                 messages=messages,
                 max_tokens=max_tokens,
                 temperature=temperature,
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"} # Con esto le obligamos a que el formato que nos mande sea json
             )            
             response_text = completion.choices[0].message.content
             return json.loads(response_text)
@@ -159,7 +165,10 @@ class OpenAIClient:
             print(f"   Tipo de error: {type(e).__name__}")
             sys.exit(1)
             
-    def _build_few_shoot(self):        
+    def _build_few_shoot(self):       
+        '''
+        Funcion para crear mensajes de ejemplo para que openai genere una respuesta exacta
+        ''' 
         data = load_data("multishot_comandos_delay.json")
         messages = []
         for message in data:

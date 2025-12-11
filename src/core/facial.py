@@ -12,6 +12,10 @@ class Facial:
         if cls._instance is None:
             cls._instance = super(Facial, cls).__new__(cls)
             cls._instance.camara = cv2.VideoCapture(0)
+            
+            if not cls._instance.camara.isOpened():
+                raise RuntimeError("No se detecta ninguna cámara web conectada.")
+            
             cls._instance.sound = Sound()
             cls._instance.voice = Voice()
             
@@ -61,7 +65,7 @@ class Facial:
                     
                     elapsed_time = time.time() - success_start
                     
-                    # ÉXITO: 3 segundos
+                    # ÉXITO: 5 segundos
                     if elapsed_time >= 5:
                         self.sound.play_sound(self.sound.END_SOUND)
                         cv2.destroyAllWindows()
@@ -127,7 +131,7 @@ class Facial:
                     
                     elapsed_time = time.time() - start_time
                     
-                    if elapsed_time >= 3:
+                    if elapsed_time >= 5:
                         self.sound.play_sound(self.sound.END_SOUND)
                         cv2.destroyAllWindows()
                         time.sleep(1)

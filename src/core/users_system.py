@@ -31,6 +31,9 @@ class User:
         self.face_code = face_code
     
     def to_dict(self):
+        '''
+        Funcion que transforma la informacion de este usuario a un formato JSON
+        '''
         face_data = self.face_code
         if hasattr(face_data, 'tolist'):
             face_data = face_data.tolist()
@@ -43,6 +46,9 @@ class User:
         }
     
     def from_dict(self, data):
+        '''
+        Funcion que extrae la informacion del JSON y la guarda en este usuario
+        '''
         self.nickname = data["nickname"]
         self.name = data["name"]
         self.last_name = data["last_name"]
@@ -193,25 +199,11 @@ class Login:
                                     return user
                                 else:
                                     self.voice.talk("El usuario es correcto, pero no se ha podido verificar el gesto. Por favor intentelo de nuevo")
+                            else:
+                                return None
+                                
             else:
-                self.voice.talk(f"Ha habido un error al reconocer tu cara.")
-                               
-        return None
-
-        
-    def check_user_face(self, user):
-        photo = self.facial.take_photo()
-        if photo is not None:
-            photo = self.facial.assign_color_profile(photo)
-            photo_codes = self.facial.get_cod_face(photo)
-            
-            if photo_codes is not None:        
-                for code in photo_codes:
-                    if user.face_code is not None and self.facial.is_the_same(user.face_code, code):
-                        return True
-        
-        self.voice.talk(f"Ha habido un error al reconocer tu cara.")            
-        return False
+                self.voice.talk(f"Ha habido un error al reconocer tu cara. Intentelo de nuevo")
         
     def _exist_users(self):
         return len(self.users) > 0
